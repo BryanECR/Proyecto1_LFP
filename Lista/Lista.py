@@ -36,3 +36,5 @@ class ListaCircular:
                     break 
 
                 aux = aux.siguiente
+            
+            return "No existe"
