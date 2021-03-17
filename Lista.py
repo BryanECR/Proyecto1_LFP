@@ -1,4 +1,4 @@
-from Lista.Nodo import Nodo
+from Nodo import Nodo
 
 class ListaCircular:
 
@@ -11,16 +11,16 @@ class ListaCircular:
 
     def incertar(self,id,nombre,precio):
         if self.vacia():
-            self.primero = self.ultimo = Nodo(nombre,id,nombre,precio)
+            self.primero = self.ultimo = Nodo(id,nombre,precio)
         else:
             aux = self.ultimo
-            self.ultimo = aux.siguiente = Nodo(nombre,id,nombre,precio)
+            self.ultimo = aux.siguiente = Nodo(id,nombre,precio)
             self.ultimo.siguiente  = self.primero
 
     def recorrer(self):
         aux = self.primero
         while aux.siguiente != self.primero:
-            print(aux.id, aux.nombre, aux.precio)
+            print(aux.precio)
             aux = aux.siguiente
         print(aux.nombre)
 

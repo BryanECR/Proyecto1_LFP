@@ -5,8 +5,8 @@ class Factura:
         pass    
         
     def datos(arreglo):
+        total = 0
         errores = []
-
         linea1 = arreglo[0].split(",")
 
         nombre = str(linea1[0]).strip().replace("'","")

@@ -1,4 +1,6 @@
-from Funciones.Lectura import LeerArchivos
+from Lectura import LeerArchivos
+from Lista import ListaCircular
+from Analizar import Analizar
 
 class Menu:
 
@@ -35,9 +37,13 @@ class Menu:
                 lineasOrden = LeerArchivos.abrirArchivo()
                 print(lineasOrden)
             elif(Opcion == 3):
-                print("OPCION VALIDA")
+                print("\n*************************** Menu Generado con exito ***************************")
             elif(Opcion == 4):
-                print("OPCION VALIDA")
+                listaC = ListaCircular()
+                if listaC.recorrer() == "No hay elementos en la lista":
+                    print("Error: No se ah cargado ningun menu con anterioridad ")
+                else:
+                    print("\n*************************** Factura Generada con exito ***************************")
             elif(Opcion == 5):
                 print("OPCION VALIDA")
             elif(Opcion == 6):
