@@ -17,12 +17,10 @@ class ListaCircular:
             self.ultimo = aux.siguiente = Nodo(id,nombre,precio)
             self.ultimo.siguiente  = self.primero
 
-    def recorrer(self):
-        aux = self.primero
-        while aux.siguiente != self.primero:
-            print(aux.precio)
-            aux = aux.siguiente
-        print(aux.nombre)
+    def verificar(self):
+        if self.vacia():
+            return ("No hay elementos en la lista")
+
 
     def buscar(self,buscar):
         aux = self.primero

@@ -1,4 +1,4 @@
-from os import error
+import os
 from Lista import ListaCircular
 
 
@@ -113,7 +113,9 @@ class Analizar:
         <div class="Content">'''
 
         errores = []
-        
+        grafica = ""
+        NumeroCategoria = 0
+        NumeroHijo = 0
         datos = []
         nombreR = ""
         letras = ['r','e','s','t','a','u','r','a','n','t','e','R','E','S','T','A','U','R','A','N','T','E','=',"'"," "]
@@ -172,6 +174,7 @@ class Analizar:
 
         # -- print("Nombre: "+str(nombreR))
         html += '<h1 class="titulo" >'+str(nombreR)+'</h1>'
+        grafica += 'A[label="'+str(nombreR)+'"]\n'
         #ANALIZAR EL RESTO DEL ARCHIVO
         contador = 1
         while(contador < len(arreglo)):
@@ -192,6 +195,9 @@ class Analizar:
                     
                     # -- print("\nCategoria: "+str(categoria))
                     html += '<h2 class="categoria">'+str(categoria)+'</h2>'
+                    grafica += 'Categoria'+str(NumeroCategoria)+'[label = "'+categoria+'"]\n'
+                    grafica += "A -> "+'Categoria'+str(NumeroCategoria)+"\n"
+                    NumeroCategoria += 1
 
         # 2. SI EMPIEZA COM [ ES UN PRODUCTO
             elif caracteres[0] == "[":
@@ -220,6 +226,9 @@ class Analizar:
                     ListaC.incertar(id,Nombre,Precio)
                     html += '<h3 class="producto">&emsp;'+str(Nombre)+'</h3><h3 class="producto">&emsp;'+str(Precio)+'</h3>'
                     html += '<p>&emsp;'+str(Descripcion)+'</p>'
+                    grafica += 'CategoriaHijo'+str(NumeroHijo)+'[label = "'+str(Nombre)+" "+str(Precio)+ '"]\n'
+                    grafica += 'Categoria'+str(NumeroCategoria-1)+" -> "+'CategoriaHijo'+str(NumeroHijo)+"\n"
+                    NumeroHijo += 1
 
         # 3. CUALQUIER LINEA DIFERENTE SERA UN CARACTER DESCONOCIDO
             elif caracteres[0] != "\n":
@@ -255,6 +264,7 @@ class Analizar:
                          <th>Error</th>
                         </tr>
                 '''
+                
             for i in range(len(errores)):
                 htmlerrores += "<tr>\n<td>"+str(i+1)+"</td>\n"
                 htmlerrores += "<td>"+str(errores[i]['Linea'])+"</td>\n"
@@ -265,33 +275,13 @@ class Analizar:
             file.write(htmlerrores)
             file.close()
         else:
+            #GENERA EL HTML SI EL ARCHIVO NO TIENE ERRORES
             file = open("Menu.html","w")
             file.write(html)
             file.close()
-
-
-
+            #GENERA LA GRAFICA PARA EL ARCHIVO
+            file = open("Grafica.dot","w")
+            file.write("digraph G {\n"+str(grafica)+"\n}")
+            file.close()
+            os.system('dot -Tpng Grafica.dot -o Grafica.png')
         
-        
-
-arreglo = ["restaursante='Restaurante LFP'",
-"'Bebidas':\n",
-"@\n"
-"[bebida*1 %;'Bebida #1';11.00;'Descripción Bebida 1']\n",
-"[bebida-2;'Bebida #2';10.50;'Descripción Bebida 2']\n",
-"[bebida_3;'Bebida #2';10.50;'Descripción Bebida 2']\n",
-"[bebida_4;'Bebida #2';10.50;'Descripción Bebida 2']\n",
-"[bebida_5;'Bebida #2';10.50;'Descripción Bebida 2']\n",
-'\n',
-"'Desayunos':\n",
-"[d1;'Desayuno 1';45.a;'Descripción']\n",
-"[d2 ?;'Desayuno 2';40.00;'Descripción']\n",
-"[d3;'Desayuno 3';35.da;'Descripción']\n", '\n',
-"'Postres':\n",
-"[pos_001;'Postre 1';25;'Descripción']\n",
-"[pos_002;'Postre 1';25;'Descripción']\n",
-"[pos_003;'Postre 1';25;'Descripción']\n",
-"[pos_004;'Postre 1';25;'Descripción']\n",
-"[pos-004;'Postre 1';25;'Descripción']"]
-
-Analizar.analizarMenu(arreglo)

@@ -37,10 +37,14 @@ class Menu:
                 lineasOrden = LeerArchivos.abrirArchivo()
                 print(lineasOrden)
             elif(Opcion == 3):
-                print("\n*************************** Menu Generado con exito ***************************")
+                listaC = ListaCircular()
+                if listaC.verificar() == "No hay elementos en la lista":
+                    print("Error: No se ah cargado ningun menu con anterioridad ")
+                else:
+                    print("\n*************************** Menu Generado con exito ***************************")
             elif(Opcion == 4):
                 listaC = ListaCircular()
-                if listaC.recorrer() == "No hay elementos en la lista":
+                if listaC.verificar() == "No hay elementos en la lista":
                     print("Error: No se ah cargado ningun menu con anterioridad ")
                 else:
                     print("\n*************************** Factura Generada con exito ***************************")
