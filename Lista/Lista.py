@@ -53,7 +53,7 @@ class ListaCircular:
             while aux.siguiente != self.primero:
                 
                 if aux.id == buscar:
-                    return aux.precio
+                    return aux.nombre
 
                 aux = aux.siguiente
             

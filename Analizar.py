@@ -3,8 +3,7 @@ from Lista.Lista import ListaCircular
 
 ListaC = ListaCircular()
 class Analizar:
-    
-    
+
     def analizarPrecio(cadena):
         numero = str(cadena).replace(" ","")
         try:
@@ -54,8 +53,7 @@ class Analizar:
                 while(contador < len(caracteres)):
 
                     if caracteres[contador] != "\n" or caracteres[contador] != " ":
-                       # -- print("caracter Desconocido: "+str(caracteres[contador]))
-                       errores = {"Linea": linea, "Error":"Caracter Desconocido "+str(caracteres[contador])}
+                       informacion = {"Linea": linea, "Error":"Caracter Desconocido "+str(caracteres[contador])}
 
                     contador += 1
 
@@ -123,7 +121,7 @@ class Analizar:
         nombreR = ""
         letras = ['r','e','s','t','a','u','r','a','n','t','e','R','E','S','T','A','U','R','A','N','T','E','=',"'"," "]
         #ANALIZAR LA PRIMERA LINEA
-        nombre = arreglo[0].strip()
+        nombre = str(arreglo[0]).strip()
         nombre = list(nombre)
         cantidadDeIguales = []
         cantidadDeComilals = []
@@ -235,7 +233,6 @@ class Analizar:
                 informacion = {"Linea": contador,"Error":"Caracter Desconocido: "+str(arreglo[contador])}
                 errores.append(informacion)
 
-        
             contador += 1
             
         html += "   </div>\n   </body>\n</html>"
@@ -270,7 +267,7 @@ class Analizar:
                 htmlerrores += "<td>"+str(errores[i]['Error'])+"</td>\n</tr>"
 
             htmlerrores += "</table>\n</div>\n</body>\n</html>"
-            file = open("Errores.html","w")
+            file = open("ErroresMenu.html","w")
             file.write(htmlerrores)
             file.close()
         else:
@@ -310,9 +307,7 @@ class Analizar:
         <div class="content"> '''
         
         errores = []
-        linea1 = arreglo[0].split(",")
-
-        print(linea1)
+        linea1 = str(arreglo[0]).split(",")
 
         nombre = str(linea1[0]).strip().replace("'","")
         nit = str(linea1[1]).strip().replace("'","")
@@ -339,10 +334,6 @@ class Analizar:
                     <td class="tg-r5us">Total</td>
                   </tr>'''
 
-
-        #-- datosCliente = {'Nombre':nombre,'Nit':nit,'Direccion':direccion,'Propina':propina}
-        # -- print(datosCliente)
-
         lineas = len(arreglo)
         contador  = 1
         SUBtotal  = 0
@@ -361,21 +352,26 @@ class Analizar:
                 errores.append(informacion)
             
             #BUSCAR PRODUCTO Y SI NO EXISTE EN LA LISTA AGREGARLO COMO ERROR
-            nombreProducto = str(datos[1])
-            precio =  ListaC.buscar(nombreProducto) 
-            print(datos[0],datos[1],precio)
+            idABuscar = datos[1]
+            nombreProducto = ListaC.buscarNombre(idABuscar)
+            precio =  ListaC.buscar(idABuscar) 
 
-            
             try:
                 precio = float(precio)
             except:
                 print("")
                 
-
             if precio == "No existe" or precio == "No hay elementos en la lista":
+
                 informacion = {"Linea":contador,"Error":precio}
                 errores.append(informacion)
-            else:#REVISAR ESTA PARTE
+
+            elif nombreProducto == "No existe" or nombreProducto  == "No hay elementos en la lista":
+
+                informacion = {"Linea":contador,"Error":nombreProducto}
+                errores.append(informacion)
+
+            else:
                html += '<tr>\n<td class="tg-3ib7">'+str(cantidad)+'</td>\n<td class="tg-3ib7">'+str(nombreProducto)+'</td>\n<td class="tg-r5us">Q '+str(precio)+'</td>\n<td class="tg-r5us">Q '+str(cantidad*precio )+'</td>\n</tr>'
                SUBtotal += (cantidad*precio)
 
@@ -389,10 +385,41 @@ class Analizar:
 
         if len(errores) > 1:
             print("El archivo de la factura contiene errores por lo que no fue posible generarlo")
+            htmlerrores = '''
+            <html lang="es">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Errores</title>
+                    <style>
+                        table, th, td {
+                            border: 1px solid black;
+                        }
+                    </style>
+                </head>
+                <body>
+                <div class="content">
+                    <h1 align = "center">TABLA DE ERRORES</h1>
+                    <table class="default" align = "center">
+                        <tr>
+                         <th>Numero</th>
+                         <th>Linea</th>
+                         <th>Error</th>
+                        </tr>
+                '''
+                
+            for i in range(len(errores)):
+                htmlerrores += "<tr>\n<td>"+str(i+1)+"</td>\n"
+                htmlerrores += "<td>"+str(errores[i]['Linea'])+"</td>\n"
+                htmlerrores += "<td>"+str(errores[i]['Error'])+"</td>\n</tr>"
+
+            htmlerrores += "</table>\n</div>\n</body>\n</html>"
+            file = open("ErroresFactura.html","w")
+            file.write(htmlerrores)
+            file.close()
+
+
         else:
             file = open("Factura.html","w")
             file.write(html)
             file.close()
         
-
-# 1. BUSCAR EL NOMBRE DEL ID QUE SE BUSCA PARA GENERAR LA FACTURA
