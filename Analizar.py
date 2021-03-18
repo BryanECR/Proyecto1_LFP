@@ -1,10 +1,10 @@
 import os
-from Lista import ListaCircular
+from Lista.Lista import ListaCircular
 
-
+ListaC = ListaCircular()
 class Analizar:
     
-
+    
     def analizarPrecio(cadena):
         numero = str(cadena).replace(" ","")
         try:
@@ -68,17 +68,20 @@ class Analizar:
         numeros = ["0","1","2","3","4","5","6","7","8","9"]
         cadena1 = str(cadena).strip()
         caracteres = list(cadena1)
+        id = ""
 
         for i in range(len(caracteres)):
             
             if caracteres[i] in letras or caracteres[i] in numeros:
-                pass
+                id += str(caracteres[i])
             else:
                 return "Id no valido"
+
+        return id
             
     
     def analizarMenu(arreglo):
-        ListaC = ListaCircular()
+        global ListaC
         html = '''<html lang="es">
          <head>
             <meta charset="Utf-8">
@@ -147,8 +150,7 @@ class Analizar:
             informacion = {"Linea":1,"Error": "Existe mas de un igual"}
             errores.append(informacion)
 
-        
-        
+    
         # HACER CADENA DENTRO DE LAS COMILLAS
         if len(cantidadDeComilals) == 1:
             informacion = {"Linea":1,"Error":"Falta una comilla"}
@@ -221,10 +223,8 @@ class Analizar:
                     informacion = {"Linea":contador,"Error":Descripcion}
                     errores.append(informacion)
                 else:
-                    
-                   #---- print(Nombre,Precio,Descripcion)
                     ListaC.incertar(id,Nombre,Precio)
-                    html += '<h3 class="producto">&emsp;'+str(Nombre)+'</h3><h3 class="producto">&emsp;'+str(Precio)+'</h3>'
+                    html += '<h3 class="producto">&emsp;'+str(Nombre)+'</h3><h3 class="producto">&emsp;Q '+str(Precio)+'</h3>'
                     html += '<p>&emsp;'+str(Descripcion)+'</p>'
                     grafica += 'CategoriaHijo'+str(NumeroHijo)+'[label = "'+str(Nombre)+" "+str(Precio)+ '"]\n'
                     grafica += 'Categoria'+str(NumeroCategoria-1)+" -> "+'CategoriaHijo'+str(NumeroHijo)+"\n"
@@ -232,7 +232,6 @@ class Analizar:
 
         # 3. CUALQUIER LINEA DIFERENTE SERA UN CARACTER DESCONOCIDO
             elif caracteres[0] != "\n":
-                # -- print("caracter Desconocido: "+str(arreglo[contador]))
                 informacion = {"Linea": contador,"Error":"Caracter Desconocido: "+str(arreglo[contador])}
                 errores.append(informacion)
 
@@ -284,4 +283,116 @@ class Analizar:
             file.write("digraph G {\n"+str(grafica)+"\n}")
             file.close()
             os.system('dot -Tpng Grafica.dot -o Grafica.png')
+            
+ #*****************************************************************************************************    
+    def ver():
+        return ListaC.recorrer()
+   
         
+    def datos(arreglo):
+        html = '''
+        <html lang="es">
+        <head>
+        <meta charset="utf-8">
+        <title>Factura</title>
+        <style type="text/css">
+            .tg  {border-collapse:collapse;border-spacing:0;}
+            .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+              overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+              font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg .tg-9gth{border-color:inherit;font-family:"Courier New", Courier, monospace !important;;text-align:left;vertical-align:top}
+            .tg .tg-3ib7{border-color:inherit;font-family:"Courier New", Courier, monospace !important;;text-align:center;vertical-align:top}
+            .tg .tg-r5us{font-family:"Courier New", Courier, monospace !important;;text-align:center;vertical-align:top}
+            </style>
+        </head>
+        <body>
+        <div class="content"> '''
+        
+        errores = []
+        linea1 = arreglo[0].split(",")
+
+        print(linea1)
+
+        nombre = str(linea1[0]).strip().replace("'","")
+        nit = str(linea1[1]).strip().replace("'","")
+        direccion = str(linea1[2]).strip().replace("'","")
+        propina =  str(linea1[3]).replace("%","").strip()
+        try:
+            propina = float(propina)
+        except:
+            informacion = {"Linea":1,"Error":"Valor de la propina incorrecto: "+str(propina)}
+
+        html += "<h1>Datos del cliente</h1>\n<h2>Nombre: "+str(nombre)+"</h2>\n<h2>NIT: "+str(nit)+"</h2>\n<h2>Dirección: "+str(direccion)+"</h2>\n"
+
+        html += '''  <table class="tg" align = "center">
+                <thead>
+                  <tr>
+                    <th class="tg-9gth" colspan="4">Descripción del Consumo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tg-3ib7">Cantidad</td>
+                    <td class="tg-3ib7">Concepto</td>
+                    <td class="tg-r5us">Precio</td>
+                    <td class="tg-r5us">Total</td>
+                  </tr>'''
+
+
+        #-- datosCliente = {'Nombre':nombre,'Nit':nit,'Direccion':direccion,'Propina':propina}
+        # -- print(datosCliente)
+
+        lineas = len(arreglo)
+        contador  = 1
+        SUBtotal  = 0
+        
+        while(contador < lineas):
+
+            datos = str(arreglo[contador]).strip().split(",")
+            
+            try:
+                cantidad = datos[0]
+                cantidad = int(cantidad)
+            except:
+                #AGREGARLO COMO ERROR
+                cantidad = "cantidad incorrecta"
+                informacion = {"Linea":contador,"Error":"Cantidad incorrecta"}
+                errores.append(informacion)
+            
+            #BUSCAR PRODUCTO Y SI NO EXISTE EN LA LISTA AGREGARLO COMO ERROR
+            nombreProducto = str(datos[1])
+            precio =  ListaC.buscar(nombreProducto) 
+            print(datos[0],datos[1],precio)
+
+            
+            try:
+                precio = float(precio)
+            except:
+                print("")
+                
+
+            if precio == "No existe" or precio == "No hay elementos en la lista":
+                informacion = {"Linea":contador,"Error":precio}
+                errores.append(informacion)
+            else:#REVISAR ESTA PARTE
+               html += '<tr>\n<td class="tg-3ib7">'+str(cantidad)+'</td>\n<td class="tg-3ib7">'+str(nombreProducto)+'</td>\n<td class="tg-r5us">Q '+str(precio)+'</td>\n<td class="tg-r5us">Q '+str(cantidad*precio )+'</td>\n</tr>'
+               SUBtotal += (cantidad*precio)
+
+            contador +=1 
+
+        prop = SUBtotal*(propina/100)
+        html += '<tr>\n<td class="tg-3ib7" colspan="3">SubTotal</td>\n<td class="tg-r5us">Q '+str(SUBtotal)+'</td>\n</tr>'
+        html += '<tr>\n<td class="tg-3ib7" colspan="3">Propina</td>\n<td class="tg-r5us">Q '+str(prop)+'</td>\n</tr>'
+        html += '<tr>\n<td class="tg-r5us" colspan="3">Total</td>\n<td class="tg-r5us">Q '+str(SUBtotal+prop)+'</td>\n</tr>'
+        html += '</tbody>\n</table>\n</div>\n</body>\n</html>'
+
+        if len(errores) > 1:
+            print("El archivo de la factura contiene errores por lo que no fue posible generarlo")
+        else:
+            file = open("Factura.html","w")
+            file.write(html)
+            file.close()
+        
+
+# 1. BUSCAR EL NOMBRE DEL ID QUE SE BUSCA PARA GENERAR LA FACTURA

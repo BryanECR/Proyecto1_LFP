@@ -1,4 +1,4 @@
-from Nodo import Nodo
+from Lista.Nodo import Nodo
 
 class ListaCircular:
 
@@ -21,7 +21,16 @@ class ListaCircular:
         if self.vacia():
             return ("No hay elementos en la lista")
 
-
+    def recorrer(self):
+        aux = self.primero
+        if self.vacia():
+            print("No hay elementos en la lista")
+        else:
+            while aux.siguiente != self.primero:
+                print(aux.id,aux.precio)
+                aux = aux.siguiente
+            print(aux.id,aux.precio)
+            
     def buscar(self,buscar):
         aux = self.primero
         if self.vacia():
@@ -29,9 +38,22 @@ class ListaCircular:
         else:
             while aux.siguiente != self.primero:
                 
-                if aux.nombre == buscar:
+                if aux.id == buscar:
                     return aux.precio
-                    break 
+
+                aux = aux.siguiente
+            
+            return "No existe"
+
+    def buscarNombre(self,buscar):
+        aux = self.primero
+        if self.vacia():
+            print("No hay elementos en la lista")
+        else:
+            while aux.siguiente != self.primero:
+                
+                if aux.id == buscar:
+                    return aux.precio
 
                 aux = aux.siguiente
             

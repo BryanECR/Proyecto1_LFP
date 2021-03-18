@@ -1,10 +1,31 @@
-a = ["'Erick Samuel','6655443-6','Ciudad',1.5%\n", '2,crun-chy\n', '1,b5capas\n', '2,stacker\n', '3,gordita ?\n', '1,crunchy\n', '2,n_supreme\n', '3,bb3\n', '3,bb3\n', '3,b']
+from typing import List
+
+from Lista.Lista import ListaCircular
 
 class Factura:
     def __init__(self) -> None:
         pass    
         
     def datos(arreglo):
+        ListaC = ListaCircular()
+        html = '''
+        <html lang="es">
+        <head>
+        <meta charset="utf-8">
+        <title>Factura</title>
+        <style type="text/css">
+            .tg  {border-collapse:collapse;border-spacing:0;}
+            .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+              overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+              font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg .tg-9gth{border-color:inherit;font-family:"Courier New", Courier, monospace !important;;text-align:left;vertical-align:top}
+            .tg .tg-3ib7{border-color:inherit;font-family:"Courier New", Courier, monospace !important;;text-align:center;vertical-align:top}
+            .tg .tg-r5us{font-family:"Courier New", Courier, monospace !important;;text-align:center;vertical-align:top}
+            </style>
+        </head>
+        <body>
+        <div class="content"> '''
         total = 0
         errores = []
         linea1 = arreglo[0].split(",")
@@ -16,15 +37,31 @@ class Factura:
         try:
             propina = float(propina)
         except:
-            print("Error")
+            informacion = {"Linea":1,"Error":"Valor de la propina incorrecto: "+str(propina)}
 
-        datosCliente = {'Nombre':nombre,'Nit':nit,'Direccion':direccion,'Propina':propina}
-        print(datosCliente)
+        html += "<h1>Datos del cliente</h1>\n<h2>Nombre: "+str(nombre)+"</h2>\n<h2>NIT: "+str(nit)+"</h2>\n<h2>Dirección: "+str(direccion)+"</h2>\n"
+
+        html += '''  <table class="tg" align = "center">
+                <thead>
+                  <tr>
+                    <th class="tg-9gth" colspan="4">Descripción del Consumo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tg-3ib7">Cantidad</td>
+                    <td class="tg-3ib7">Concepto</td>
+                    <td class="tg-r5us">Precio</td>
+                    <td class="tg-r5us">Total</td>
+                  </tr>'''
+
+
+        #-- datosCliente = {'Nombre':nombre,'Nit':nit,'Direccion':direccion,'Propina':propina}
+        # -- print(datosCliente)
 
         lineas = len(arreglo)
         contador  = 1
         SUBtotal  = 0
-        cuenta = []
         
         while(contador < lineas):
 
@@ -36,23 +73,38 @@ class Factura:
             except:
                 #AGREGARLO COMO ERROR
                 cantidad = "cantidad incorrecta"
+                informacion = {"Linea":contador,"Error":"Cantidad incorrecta"}
+                errores.append(informacion)
             
             #BUSCAR PRODUCTO Y SI NO EXISTE EN LA LISTA AGREGARLO COMO ERROR
-            producto = datos[1].strip()
+            nombreProducto = str(datos[1])
+            precio =  ListaC.buscar(str(datos[1])) 
 
-            
-            # 1. SI CANTIDAD ES IFUAL A ERROR NO SUMARLO
-            # 2. MULTIPLICAR LA CANTIDAD POR EL PRECIO DEL PRODUCTO
-            # 3. MULTIPLICAR EL SUB TOTAL POR LA PROPINA
-            # 4. SUMAR EL SUB TOTAL Y LA PROPINA Y AGREGARLO A TOTAL
-            SUBtotal += int(cantidad)
-            print(cantidad,producto)
+            try:
+                precio = float(precio)
+            except:
+                print("No se pudo convertir el precio")
 
-
+            if precio == "No existe" or precio == "No hay elementos en la lista":
+                informacion = {"Linea":contador,"Error":precio}
+                errores.append(informacion)
+            else:#REVISAR ESTA PARTE
+               html += '<td>\n<td class="tg-3ib7">'+str(cantidad)+'</td>\n<td class="tg-3ib7">'+str(nombreProducto)+'</td>\n<td class="tg-r5us">Q '+str(precio)+'</td>\n<td class="tg-r5us">Q '+str(cantidad*precio )+'</td>\n</tr>'
+               SUBtotal += (cantidad*precio)
 
             contador +=1 
 
-        print("total de productos: "+str(total))
+        prop = SUBtotal*propina
+        html += '<tr>\n<td class="tg-3ib7" colspan="3">SubTotal</td>\n<td class="tg-r5us">Q '+str(SUBtotal)+'</td>\n</tr>'
+        html += '<tr>\n<td class="tg-3ib7" colspan="3">Propina</td>\n<td class="tg-r5us">Q '+str(prop)+'</td>\n</tr>'
+        html += '<tr>\n<td class="tg-r5us" colspan="3">Total</td>\n<td class="tg-r5us">Q '+str(SUBtotal+prop)+'</td>\n</tr>'
+        html += '</tbody>\n</table>\n</div>\n</body>\n</html>'
+
+        if errores > 1:
+            print("El archivo de la factura contiene errores por lo que no fue posible generarlo")
+        else:
+            file = open("Factura.html","w")
+            file.write(html)
+            file.close()
 
 
-Factura.datos(a)
