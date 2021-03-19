@@ -4,6 +4,75 @@ from Lista.Lista import ListaCircular
 ListaC = ListaCircular()
 class Analizar:
 
+    def htmlTokens(arreglo,nombre):
+        htmlesV = '''
+            <html lang="es">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Tokens</title>
+                    <style>
+                        table, th, td {
+                            border: 1px solid black;
+                        }
+                    </style>
+                </head>
+                <body>
+                <div class="content">
+                    <h1 align = "center">TABLA DE Tokens</h1>
+                    <table class="default" align = "center">
+                        <tr>
+                         <th>Numero</th>
+                         <th>Linea</th>
+                         <th>Lexema</th>
+                         <th>Token</th>
+                        </tr>
+                '''
+                
+        for i in range(len(arreglo)):
+            htmlesV += "<tr>\n<td>"+str(i+1)+"</td>\n"
+            htmlesV += "<td>"+str(arreglo[i]['Linea'])+"</td>\n"
+            htmlesV += "<td>"+str(arreglo[i]['Lexema'])+"</td>\n"
+            htmlesV += "<td>"+str(arreglo[i]['Token'])+"</td>\n</tr>"
+
+        htmlesV += "</table>\n</div>\n</body>\n</html>"
+        file = open(str(nombre+".html"),"w")
+        file.write(htmlesV)
+        file.close()
+
+    def htmlErrores(errores,nombre):
+        htmlerrores = '''
+            <html lang="es">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Errores</title>
+                    <style>
+                        table, th, td {
+                            border: 1px solid black;
+                        }
+                    </style>
+                </head>
+                <body>
+                <div class="content">
+                    <h1 align = "center">TABLA DE ERRORES</h1>
+                    <table class="default" align = "center">
+                        <tr>
+                         <th>Numero</th>
+                         <th>Linea</th>
+                         <th>Error</th>
+                        </tr>
+                '''
+                
+        for i in range(len(errores)):
+            htmlerrores += "<tr>\n<td>"+str(i+1)+"</td>\n"
+            htmlerrores += "<td>"+str(errores[i]['Linea'])+"</td>\n"
+            htmlerrores += "<td>"+str(errores[i]['Error'])+"</td>\n</tr>"
+
+        htmlerrores += "</table>\n</div>\n</body>\n</html>"
+        file = open(str(nombre+".html"),"w")
+        file.write(htmlerrores)
+        file.close()
+
+
     def analizarPrecio(cadena):
         numero = str(cadena).replace(" ","")
         try:
@@ -117,7 +186,7 @@ class Analizar:
         grafica = ""
         NumeroCategoria = 0
         NumeroHijo = 0
-        datos = []
+        tokens = []
         nombreR = ""
         letras = ['r','e','s','t','a','u','r','a','n','t','e','R','E','S','T','A','U','R','A','N','T','E','=',"'"," "]
         #ANALIZAR LA PRIMERA LINEA
@@ -161,8 +230,9 @@ class Analizar:
             while(contador < cantidadDeComilals[1]):
                 nombreR += nombre[contador]
                 contador += 1
-            informacion = {"Lexema":nombreR,"Token": "cadena"}
-            datos.append(informacion)
+
+            informacion = {"Linea":1 ,"Lexema":nombreR,"Token": "cadena"}
+            tokens.append(informacion)
             # SI EXISTE UN CARACTER FUERA DE LAS COMILLAS REPORTARLO COMO ERROR
             if cantidadDeComilals[1] < len(nombre):
                 contador = cantidadDeComilals[1]
@@ -192,7 +262,8 @@ class Analizar:
                     errores.append(informacion)
 
                 else:
-                    
+                    informacion = {"Linea":contador+1,"Lexema":categoria,"Token": "cadena"}
+                    tokens.append(informacion)
                     # -- print("\nCategoria: "+str(categoria))
                     html += '<h2 class="categoria">'+str(categoria)+'</h2>'
                     grafica += 'Categoria'+str(NumeroCategoria)+'[label = "'+categoria+'"]\n'
@@ -222,6 +293,12 @@ class Analizar:
                     errores.append(informacion)
                 else:
                     ListaC.incertar(id,Nombre,Precio)
+                    informacion = {"Linea":contador+1,"Lexema":id,"Token": "Identificador"}
+                    tokens.append(informacion)
+                    informacion = {"Linea":contador+1,"Lexema":Nombre,"Token": "cadena"}
+                    tokens.append(informacion)
+                    informacion = {"Linea":contador+1,"Lexema":Precio,"Token": "Numero"}
+                    tokens.append(informacion)
                     html += '<h3 class="producto">&emsp;'+str(Nombre)+'</h3><h3 class="producto">&emsp;Q '+str(Precio)+'</h3>'
                     html += '<p>&emsp;'+str(Descripcion)+'</p>'
                     grafica += 'CategoriaHijo'+str(NumeroHijo)+'[label = "'+str(Nombre)+" "+str(Precio)+ '"]\n'
@@ -239,37 +316,7 @@ class Analizar:
         
         if len(errores) > 1:
             print("El Documento tiene errores por lo que no es porsible generar el Menu")
-            htmlerrores = '''
-            <html lang="es">
-                <head>
-                    <meta charset="utf-8">
-                    <title>Errores</title>
-                    <style>
-                        table, th, td {
-                            border: 1px solid black;
-                        }
-                    </style>
-                </head>
-                <body>
-                <div class="content">
-                    <h1 align = "center">TABLA DE ERRORES</h1>
-                    <table class="default" align = "center">
-                        <tr>
-                         <th>Numero</th>
-                         <th>Linea</th>
-                         <th>Error</th>
-                        </tr>
-                '''
-                
-            for i in range(len(errores)):
-                htmlerrores += "<tr>\n<td>"+str(i+1)+"</td>\n"
-                htmlerrores += "<td>"+str(errores[i]['Linea'])+"</td>\n"
-                htmlerrores += "<td>"+str(errores[i]['Error'])+"</td>\n</tr>"
-
-            htmlerrores += "</table>\n</div>\n</body>\n</html>"
-            file = open("ErroresMenu.html","w")
-            file.write(htmlerrores)
-            file.close()
+            Analizar.htmlErrores(errores,"ErroresMenu")
         else:
             #GENERA EL HTML SI EL ARCHIVO NO TIENE ERRORES
             file = open("Menu.html","w")
@@ -280,6 +327,8 @@ class Analizar:
             file.write("digraph G {\n"+str(grafica)+"\n}")
             file.close()
             os.system('dot -Tpng Grafica.dot -o Grafica.png')
+            #GENERAR EL HTML DE TOKENS VALIDOS
+            Analizar.htmlTokens(tokens,"TokensMenu")
             
  #*****************************************************************************************************    
     def ver():
@@ -307,6 +356,7 @@ class Analizar:
         <div class="content"> '''
         
         errores = []
+        tokens = []
         linea1 = str(arreglo[0]).split(",")
 
         nombre = str(linea1[0]).strip().replace("'","")
@@ -317,6 +367,15 @@ class Analizar:
             propina = float(propina)
         except:
             informacion = {"Linea":1,"Error":"Valor de la propina incorrecto: "+str(propina)}
+
+        informacion = {"Linea": 1,"Lexema": nombre,"Token":"Cadena" }
+        tokens.append(informacion)
+        informacion = {"Linea": 1,"Lexema": nit,"Token":"Cadena" }
+        tokens.append(informacion)
+        informacion = {"Linea": 1,"Lexema": direccion,"Token":"Cadena" }
+        tokens.append(informacion)
+        informacion = {"Linea": 1,"Lexema": propina,"Token":"Numero" }
+        tokens.append(informacion)
 
         html += "<h1>Datos del cliente</h1>\n<h2>Nombre: "+str(nombre)+"</h2>\n<h2>NIT: "+str(nit)+"</h2>\n<h2>Dirección: "+str(direccion)+"</h2>\n"
 
@@ -372,8 +431,14 @@ class Analizar:
                 errores.append(informacion)
 
             else:
-               html += '<tr>\n<td class="tg-3ib7">'+str(cantidad)+'</td>\n<td class="tg-3ib7">'+str(nombreProducto)+'</td>\n<td class="tg-r5us">Q '+str(precio)+'</td>\n<td class="tg-r5us">Q '+str(cantidad*precio )+'</td>\n</tr>'
-               SUBtotal += (cantidad*precio)
+
+                informacion = {"Linea": contador+1,"Lexema": idABuscar,"Token":"Identificador" }
+                tokens.append(informacion)
+                informacion = {"Linea": contador+1,"Lexema": cantidad,"Token":"Numero" }
+                tokens.append(informacion)
+
+                html += '<tr>\n<td class="tg-3ib7">'+str(cantidad)+'</td>\n<td class="tg-3ib7">'+str(nombreProducto)+'</td>\n<td class="tg-r5us">Q '+str(precio)+'</td>\n<td class="tg-r5us">Q '+str(cantidad*precio )+'</td>\n</tr>'
+                SUBtotal += (cantidad*precio)
 
             contador +=1 
 
@@ -384,42 +449,14 @@ class Analizar:
         html += '</tbody>\n</table>\n</div>\n</body>\n</html>'
 
         if len(errores) > 1:
+
             print("El archivo de la factura contiene errores por lo que no fue posible generarlo")
-            htmlerrores = '''
-            <html lang="es">
-                <head>
-                    <meta charset="utf-8">
-                    <title>Errores</title>
-                    <style>
-                        table, th, td {
-                            border: 1px solid black;
-                        }
-                    </style>
-                </head>
-                <body>
-                <div class="content">
-                    <h1 align = "center">TABLA DE ERRORES</h1>
-                    <table class="default" align = "center">
-                        <tr>
-                         <th>Numero</th>
-                         <th>Linea</th>
-                         <th>Error</th>
-                        </tr>
-                '''
-                
-            for i in range(len(errores)):
-                htmlerrores += "<tr>\n<td>"+str(i+1)+"</td>\n"
-                htmlerrores += "<td>"+str(errores[i]['Linea'])+"</td>\n"
-                htmlerrores += "<td>"+str(errores[i]['Error'])+"</td>\n</tr>"
-
-            htmlerrores += "</table>\n</div>\n</body>\n</html>"
-            file = open("ErroresFactura.html","w")
-            file.write(htmlerrores)
-            file.close()
-
+            Analizar.htmlErrores(errores,"ErroresFactura")
 
         else:
+
             file = open("Factura.html","w")
             file.write(html)
             file.close()
+            Analizar.htmlTokens(tokens,"TokensFactura")
         

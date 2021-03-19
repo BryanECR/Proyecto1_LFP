@@ -23,7 +23,7 @@ class Menu:
             *                   2. Cargar Orden                       *
             *                   3. Generar Menu                       *
             *                   4. Generar Factura                    *
-            *                   5. MOSTRAR LISTA DE PRODUCTOS         *
+            *                   5. Generar Arbol                      *
             *                   6. Salir                              *
             ***********************************************************
             '''
@@ -66,4 +66,7 @@ class Menu:
             else:
                 print("\n*********** !Opcion Invalida¡ ***********\nIngrese por teclado numerico la opcion que desea ejecutar\n")
 
-Menu.menu()
+
+if __name__ == "__main__":
+    Menu.menu()
+
